@@ -2,6 +2,7 @@ const express = require('express');
 const http =  require('http');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const spot = require('./routes/spot');
 
 const hostname = 'localhost';
@@ -12,6 +13,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.json())
 
 app.use('/spot', spot);
+app.use(cors());
   
 
 const server = http.createServer(app);
