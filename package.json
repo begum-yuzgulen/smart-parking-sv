@@ -13,8 +13,19 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "http": "0.0.1-security",
+    "http-errors": "^1.7.3",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.11",
     "morgan": "^1.10.0",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^6.0.1",
+    "path": "^0.12.7",
+    "pug": "^2.0.4",
+    "session-file-store": "^1.4.0"
   }
 }

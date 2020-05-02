@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 var mysql = require('mysql')
 const config = require('../config')
+var authenticate = require('../authenticate');
 
 const spotRouter = express.Router();
 
@@ -15,7 +16,7 @@ connection.connect(function(err) {
     console.log('Connected to the MySQL server.');
 });
 
-spotRouter.route('/').get( (req,res,next) => {
+spotRouter.route('/').get(authenticate.verifyUser, (req,res,next) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
     
@@ -27,7 +28,7 @@ spotRouter.route('/').get( (req,res,next) => {
         }
     });
 });
-spotRouter.route('/:sectionId').get( (req,res,next) => {
+spotRouter.route('/:sectionId').get(authenticate.verifyUser, (req,res,next) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
     
