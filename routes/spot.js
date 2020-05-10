@@ -18,7 +18,7 @@ connection.connect(function(err) {
 
 spotRouter.route('/').get(authenticate.verifyUser, (req,res,next) => {
     res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Type', 'application/json');
     
     connection.query('SELECT * FROM Spot', function (err, rows, fields) {
         try{
@@ -60,7 +60,7 @@ spotRouter.route('/').get(authenticate.verifyUser, (req,res,next) => {
 });
 spotRouter.route('/:sectionId').get(authenticate.verifyUser, (req,res,next) => {
     res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Type', 'application/json');
     
     connection.query(`SELECT * FROM Spot WHERE ID LIKE '${req.params.sectionId}%'`, function (err, rows, fields) {
         try{
@@ -69,6 +69,38 @@ spotRouter.route('/:sectionId').get(authenticate.verifyUser, (req,res,next) => {
             console.log(e);
         }
     });
-});
 
+});
+spotRouter.route('/:sectionId/profile').get(authenticate.verifyUser, (req,res,next) => {
+    let profile = {
+        email: req.user.username,
+        cardId: "",
+        mat_number: "",
+        exp_date: "",
+        reserved: ""
+    }
+    connection.query(`SELECT * FROM User WHERE email = '${req.user.username}'`, function (err, rows, fields) {
+        try{
+            profile.cardId = rows[0].cardId;
+            connection.query(`SELECT * FROM Card WHERE cardId = '${profile.cardId}'`, function (err, rows, fields) {
+                try{
+                    profile.mat_number = rows[0].mat_number;
+                    profile.exp_date = rows[0].exp_date;
+                    profile.reserved = rows[0].reserved;
+                    console.log(profile);
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.send(profile);       
+                }catch(e){
+                    console.log(e);
+                }
+            });
+        }catch(e){
+            console.log(e);
+        }
+    });
+    
+   
+  
+  });
 module.exports = spotRouter;
