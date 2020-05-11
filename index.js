@@ -30,10 +30,8 @@ connect.then((database) => {
   console.log('Connected correctly to the server');
   User.deleteMany({})
   .then((resp) => {
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.json(resp);
-  }, (err) => next(err))
+      console.log("Syncing databases")
+  })
   .catch((err) => next(err));
   connection.query(`SELECT * FROM User`, function (err, rows, fields) {
     try{
