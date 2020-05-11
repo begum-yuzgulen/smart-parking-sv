@@ -6,6 +6,14 @@ var authenticate = require('../authenticate');
 
 const spotRouter = express.Router();
 
+var connection = mysql.createConnection(config.credentials);
+connection.connect(function(err) {
+  if (err) {
+    console.log('error: ' + err.message);
+  }
+});
+
+
 spotRouter.use(bodyParser.json());
 
 spotRouter.route('/').get(authenticate.verifyUser, (req,res,next) => {
@@ -71,8 +79,12 @@ spotRouter.route('/:sectionId/profile').get(authenticate.verifyUser, (req,res,ne
         exp_date: "",
         reserved: ""
     }
+    console.log('Username:' , req.user.username);
+    console.log('Email:' , req.user.email);
     connection.query(`SELECT * FROM User WHERE email = '${req.user.username}'`, function (err, rows, fields) {
         try{
+            if(rows.length > 0 ){
+
             profile.cardId = rows[0].cardId;
             connection.query(`SELECT * FROM Card WHERE cardId = '${profile.cardId}'`, function (err, rows, fields) {
                 try{
@@ -87,6 +99,11 @@ spotRouter.route('/:sectionId/profile').get(authenticate.verifyUser, (req,res,ne
                     console.log(e);
                 }
             });
+
+        }
+        else{
+            console.log("No user found");
+        }
         }catch(e){
             console.log(e);
         }
