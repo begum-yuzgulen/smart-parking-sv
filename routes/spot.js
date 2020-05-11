@@ -8,14 +8,6 @@ const spotRouter = express.Router();
 
 spotRouter.use(bodyParser.json());
 
-var connection = mysql.createConnection(config.credentials);
-connection.connect(function(err) {
-    if (err) {
-      console.log('error: ' + err.message);
-    }
-    console.log('Connected to the MySQL server.');
-});
-
 spotRouter.route('/').get(authenticate.verifyUser, (req,res,next) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');

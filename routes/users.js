@@ -2,10 +2,22 @@ var express = require('express');
 const bodyParser = require('body-parser')
 var User = require('../models/user');
 var passport = require('passport');
+var mysql = require('mysql')
 var authenticate = require('../authenticate');
+const config = require('../config')
+var nodemailer = require('nodemailer');
+var MongoClient = require('mongodb').MongoClient;
 
 var router = express.Router();
 router.use(bodyParser.json());
+
+var connection = mysql.createConnection(config.credentials);
+connection.connect(function(err) {
+    if (err) {
+      console.log('error: ' + err.message);
+    }
+    console.log('Connected to the MySQL server.');
+});
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -50,6 +62,54 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   res.json({success: true, token: token,  status: 'You are successfully logged in!'});
 });
 
+router.post('/forgotPassword', (req, res) => {
+  console.log(req.body.email);
+  
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    port: 587,
+    auth: {
+      user: 'smart.parking.nokia@gmail.com',
+      pass: 'smartparking123!'
+    }
+  });
+  
+  connection.query(`SELECT * FROM User WHERE email = '${req.body.email}'`, function (err, rows, fields) {
+    try{
+      console.log(rows);
+      if( rows.length > 0) {
+
+        var mailOptions = {
+          from: 'smart.parking.nokia@gmail.com',
+          to: `${req.body.email}`,
+          subject: 'Password - Smart Parking System @ Nokia',
+          text: `This is your password: ${rows[0].password}. If it wasn't you who requested this message, please contact us.` 
+        };
+        
+        transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/plain');
+        res.send('Email sent');
+      }
+      else{
+        var err = new Error(`No registered user with email: ${req.body.email}`);
+        err.statusCode = 404;
+        res.setHeader('Content-Type', 'application/json');
+        res.json({statusCode:err.statusCode, message: err.message});
+        return;
+      }
+      }catch(e){
+        console.log(e);
+    }
+});
+
+});
 
 router.get('/logout', (req, res) => {
   if(req.session) {

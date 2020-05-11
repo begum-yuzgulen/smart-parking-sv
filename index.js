@@ -3,6 +3,7 @@ const http =  require('http');
 var createError = require('http-errors');
 const morgan = require('morgan');
 var path = require('path');
+var mysql = require('mysql')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const spot = require('./routes/spot');
@@ -18,12 +19,31 @@ const port = 3000;
 
 const User = require('./models/user') 
 const url = config.mongoUrl;
+var connection = mysql.createConnection(config.credentials);
+connection.connect(function(err) {
+  if (err) {
+    console.log('error: ' + err.message);
+  }
+});
 const connect = mongoose.connect(url);
 connect.then((db) => {
   console.log('Connected correctly to the server');
+  connection.query(`SELECT * FROM User`, function (err, rows, fields) {
+    try{
+      for(i = 0; i< rows.length; i++) {
+        let user = rows[i];
+        User.register(new User({username: user.email}), user.password);
+      }
+    }catch(e){
+        console.log(e);
+    }
+  });
 }, (err) => {console.log(err);});
 
+
 const app = express();
+app.connection = connection;
+app.connect = connect;
 app.set('views', path.join(__dirname, 'views'));
 app.set("view engine", "pug");
 app.use(morgan('dev'));
