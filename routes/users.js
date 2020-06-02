@@ -94,8 +94,8 @@ router.post('/forgotPassword', (req, res) => {
           }
         });
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        res.send('Email sent');
+        res.setHeader('Content-Type', 'aplication/json');
+        res.json({statusCode:200, message: "Email sent"});
       }
       else{
         var err = new Error(`No registered user with email: ${req.body.email}`);

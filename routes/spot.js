@@ -7,32 +7,33 @@ var authenticate = require('../authenticate');
 const spotRouter = express.Router();
 
 var connection = mysql.createConnection(config.credentials);
-connection.connect(function(err) {
-  if (err) {
-    console.log('error: ' + err.message);
-  }
+connection.connect(function (err) {
+    if (err) {
+        console.log('error: ' + err.message);
+    }
 });
 
 
 spotRouter.use(bodyParser.json());
 
-spotRouter.route('/').get(authenticate.verifyUser, (req,res,next) => {
+spotRouter.route('/').get(authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    
+
     connection.query('SELECT * FROM Spot', function (err, rows, fields) {
-        try{
+        try {
             let result = JSON.stringify(rows);
             let freq = {
                 a: 0,
                 b: 0,
                 c: 0,
                 d: 0,
-                e:0
+                e: 0,
+                f: 0
             }
-            for(i = 0; i< rows.length; i++) {
-               let obj = rows[i];
-                switch(obj.ID.slice(0,1)){
+            for (i = 0; i < rows.length; i++) {
+                let obj = rows[i];
+                switch (obj.ID.slice(0, 1)) {
                     case 'a':
                         freq.a += obj.isFree;
                         break;
@@ -48,30 +49,59 @@ spotRouter.route('/').get(authenticate.verifyUser, (req,res,next) => {
                     case 'e':
                         freq.e += obj.isFree;
                         break;
+                    case 'f':
+                        freq.f += obj.isFree;
+                        break;
                     default:
                         console.log(obj.ID[0]);
-                }     
-           }
+                }
+            }
             res.send(freq);
-        }catch(e){
+        } catch (e) {
             console.log(e);
         }
     });
 });
-spotRouter.route('/:sectionId').get(authenticate.verifyUser, (req,res,next) => {
+spotRouter.route('/:sectionId').get(authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    
-    connection.query(`SELECT * FROM Spot WHERE ID LIKE '${req.params.sectionId}%'`, function (err, rows, fields) {
-        try{
+
+    connection.query(`SELECT * FROM Spot WHERE ID LIKE '${req.params.sectionId}%' AND ISFREE = 1`, function (err, rows, fields) {
+        try {
             res.send(JSON.stringify(rows));
-        }catch(e){
+        } catch (e) {
             console.log(e);
         }
     });
 
 });
-spotRouter.route('/:sectionId/profile').get(authenticate.verifyUser, (req,res,next) => {
+spotRouter.route('/:sectionId/contact').post(authenticate.verifyUser, (req, res, next) => {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+
+    connection.query(`INSERT INTO Feedback VALUES (NULL,'${req.user.username}', '${req.body.message}')`, function (err, rows, fields) {
+        try {
+            res.json({ statusCode: 200, message: "Message sent" });
+        } catch (e) {
+            res.json({ statusCode: 400, message: "Message not sent" });
+            console.log(e);
+        }
+    });
+
+});
+spotRouter.route('/:sectionId/reserved').get(authenticate.verifyUser, (req, res, next) => {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    connection.query(`SELECT reserved FROM Card `, function (err, rows, fields) {
+        try {
+            res.send(JSON.stringify(rows));
+        } catch (e) {
+            console.log(e);
+        }
+    });
+
+});
+spotRouter.route('/:sectionId/profile').get(authenticate.verifyUser, (req, res, next) => {
     let profile = {
         email: req.user.username,
         cardId: "",
@@ -79,37 +109,37 @@ spotRouter.route('/:sectionId/profile').get(authenticate.verifyUser, (req,res,ne
         exp_date: "",
         reserved: ""
     }
-    console.log('Username:' , req.user.username);
-    console.log('Email:' , req.user.email);
+    console.log('Username:', req.user.username);
+    console.log('Email:', req.user.email);
     connection.query(`SELECT * FROM User WHERE email = '${req.user.username}'`, function (err, rows, fields) {
-        try{
-            if(rows.length > 0 ){
+        try {
+            if (rows.length > 0) {
 
-            profile.cardId = rows[0].cardId;
-            connection.query(`SELECT * FROM Card WHERE cardId = '${profile.cardId}'`, function (err, rows, fields) {
-                try{
-                    profile.mat_number = rows[0].mat_number;
-                    profile.exp_date = rows[0].exp_date;
-                    profile.reserved = rows[0].reserved;
-                    console.log(profile);
-                    res.statusCode = 200;
-                    res.setHeader('Content-Type', 'application/json');
-                    res.send(profile);       
-                }catch(e){
-                    console.log(e);
-                }
-            });
+                profile.cardId = rows[0].cardId;
+                connection.query(`SELECT * FROM Card WHERE cardId = '${profile.cardId}'`, function (err, rows, fields) {
+                    try {
+                        profile.mat_number = rows[0].mat_number;
+                        profile.exp_date = rows[0].exp_date;
+                        profile.reserved = rows[0].reserved;
+                        console.log(profile);
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'application/json');
+                        res.send(profile);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
 
-        }
-        else{
-            console.log("No user found");
-        }
-        }catch(e){
+            }
+            else {
+                console.log("No user found");
+            }
+        } catch (e) {
             console.log(e);
         }
     });
-    
-   
-  
-  });
+
+
+
+});
 module.exports = spotRouter;

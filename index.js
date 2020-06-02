@@ -28,21 +28,6 @@ connection.connect(function(err) {
 const connect = mongoose.connect(url);
 connect.then((database) => {
   console.log('Connected correctly to the server');
-  User.deleteMany({})
-  .then((resp) => {
-      console.log("Syncing databases");
-      connection.query(`SELECT * FROM User`, function (err, rows, fields) {
-        try{
-          for(i = 0; i< rows.length; i++) {
-            let user = rows[i];
-            User.register(new User({username: user.email}), user.password);
-          }
-        }catch(e){
-            console.log(e);
-        }
-      });
-  })
-  .catch((err) => next(err));
  
 }, (err) => {console.log(err);});
 
