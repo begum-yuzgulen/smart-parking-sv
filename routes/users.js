@@ -11,14 +11,6 @@ var MongoClient = require('mongodb').MongoClient;
 var router = express.Router();
 router.use(bodyParser.json());
 
-var connection = mysql.createConnection(config.credentials);
-connection.connect(function(err) {
-    if (err) {
-      console.log('error: ' + err.message);
-    }
-    console.log('Connected to the MySQL server.');
-});
-
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');

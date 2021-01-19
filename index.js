@@ -17,14 +17,7 @@ const mongoose = require('mongoose');
 const hostname = 'localhost';
 const port = 3000;
 
-const User = require('./models/user') 
 const url = config.mongoUrl;
-var connection = mysql.createConnection(config.credentials);
-connection.connect(function(err) {
-  if (err) {
-    console.log('error: ' + err.message);
-  }
-});
 const connect = mongoose.connect(url);
 connect.then((database) => {
   console.log('Connected correctly to the server');
@@ -33,7 +26,6 @@ connect.then((database) => {
 
 
 const app = express();
-app.connection = connection;
 app.connect = connect;
 app.set('views', path.join(__dirname, 'views'));
 app.set("view engine", "pug");
