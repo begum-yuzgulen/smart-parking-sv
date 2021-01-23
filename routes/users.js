@@ -24,25 +24,19 @@ router.post('/signup', async (req, res, next) => {
     res.json({success: false, status: "The provided email is already in use."});
     return;
   }
-  const newUser = {
-    username: req.body.email,
-    email: req.body.email,
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
-  }
-  User.register(new User(newUser), req.body.password, (err, user) => {
-
+  User.register(new User({username: req.body.email}), req.body.password, (err, user) => {
     if(err){
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
       res.json({err:err});
     }
     else {
-      if(req.body.firstname)
-        user.firstname = req.body.firstname;
-      if(req.body.lastname)
-        user.lastname = req.body.lastname;
-      user.save((err, user) => {
+      const user = {
+        email: req.body.email,
+        firstname: req.body.firstname,
+        lastname: req.body.lastname
+      };
+      await user.save((err, user) => {
         if(err){
           res.statusCode = 500;
           res.setHeader('Content-Type', 'application/json');
