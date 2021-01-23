@@ -20,13 +20,13 @@ subsRouter.route('/').get(authenticate.verifyUser, async (req, res, next) => {
 subsRouter.route('/:username').get(authenticate.verifyUser, async (req, res, next) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
-  const subscriptions = await Subscription.find({email: req.params.username});
+  const subscriptions = await Subscription.find({email: req.params.email});
   res.send(subscriptions)
 });
 
 subsRouter.route('/').post(authenticate.verifyUser, async (req, res, next) => {
   const sub = {
-    email: req.body.user,
+    email: req.body.email,
     cardId: req.body.cardId,
     mat_number: req.body.matNumber,
     exp_date: req.body.expDate,
@@ -48,7 +48,7 @@ subsRouter.route('/').post(authenticate.verifyUser, async (req, res, next) => {
 
 subsRouter.route('/extend').post(authenticate.verifyUser, async (req, res, next) => {
   const result = await Subscription.updateMany(
-    {email: req.params.user}, 
+    {email: req.params.email}, 
     {exp_date: req.params.expDate}
   );
   if (result.nModified > 0) {
