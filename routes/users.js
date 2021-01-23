@@ -31,17 +31,19 @@ router.post('/signup', async (req, res, next) => {
       res.json({err:err});
     }
     else {
-      const user = {
-        email: req.body.email,
-        firstname: req.body.firstname,
-        lastname: req.body.lastname
-      };
+      user.email = req.body.email,
+      user.firstname = req.body.firstname,
+      user.lastname = req.body.lastname
       await user.save((err, user) => {
         if(err){
           res.statusCode = 500;
           res.setHeader('Content-Type', 'application/json');
           res.json({err:err});
           return;
+        }
+        req.body = {
+          username: req.body.email,
+          password: req.body.password,
         }
         passport.authenticate('local')(req,res, () => {
           res.statusCode = 200;
