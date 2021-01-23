@@ -17,10 +17,10 @@ subsRouter.route('/').get(authenticate.verifyUser, async (req, res, next) => {
   res.send(subscriptions)
 });
 
-subsRouter.route('/:username').get(authenticate.verifyUser, async (req, res, next) => {
+subsRouter.route('/profile').get(authenticate.verifyUser, async (req, res, next) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
-  const subscriptions = await Subscription.find({email: req.params.email});
+  const subscriptions = await Subscription.find({email: req.user.username});
   res.send(subscriptions)
 });
 
