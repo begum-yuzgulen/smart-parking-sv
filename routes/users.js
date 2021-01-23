@@ -24,7 +24,7 @@ router.post('/signup', async (req, res, next) => {
     res.json({success: false, status: "The provided email is already in use."});
     return;
   }
-  User.register(new User({username: req.body.email}), req.body.password, (err, user) => {
+  User.register(new User({username: req.body.email}), req.body.password, async (err, user) => {
     if(err){
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
