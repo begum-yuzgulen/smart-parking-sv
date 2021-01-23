@@ -8,7 +8,7 @@ const Spot = require("../models/spot");
 const spotRouter = express.Router();
 spotRouter.use(bodyParser.json());
 
-spotRouter.route('/').get(async (req, res, next) => {
+spotRouter.route('/').get(authenticate.verifyUser, async (req, res, next) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     const spots = await Spot.find({});
@@ -25,7 +25,7 @@ spotRouter.route('/').get(async (req, res, next) => {
     })
     res.send(freq);
 });
-spotRouter.route('/:sectionId').get(async(req, res, next) => {
+spotRouter.route('/:sectionId').get(authenticate.verifyUser, async(req, res, next) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     const sectionSpots = await Spot.find({

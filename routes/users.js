@@ -16,8 +16,20 @@ router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
-router.post('/signup', (req, res, next) => {
-  User.register(new User({username: req.body.username}), req.body.password, (err, user) => {
+router.post('/signup', async (req, res, next) => {
+  const emailExists = await User.find({email: req.body.email});
+  if (emailExists > 0) {
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: false, status: "The provided email is already in use."});
+    return;
+  }
+  const newUser = {
+    email: req.body.email,
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+  }
+  User.register(new User(newUser), req.body.password, (err, user) => {
 
     if(err){
       res.statusCode = 500;
@@ -46,18 +58,15 @@ router.post('/signup', (req, res, next) => {
   })
 });
 
-router.post('/login', passport.authenticate('local'), (req, res) => {
-  
-  var token = authenticate.getToken({_id: req.user._id});
+router.post('/login', passport.authenticate('local'), (req, res) => { 
+  const token = authenticate.getToken({_id: req.user._id});
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
   res.json({success: true, token: token,  status: 'You are successfully logged in!'});
 });
 
-router.post('/forgotPassword', (req, res) => {
-  console.log(req.body.email);
-  
-  var transporter = nodemailer.createTransport({
+router.post('/forgotPassword', async (req, res) => {
+  const transporter = nodemailer.createTransport({
     service: 'gmail',
     port: 587,
     auth: {
@@ -66,41 +75,33 @@ router.post('/forgotPassword', (req, res) => {
     }
   });
   
-  connection.query(`SELECT * FROM User WHERE email = '${req.body.email}'`, function (err, rows, fields) {
-    try{
-      console.log(rows);
-      if( rows.length > 0) {
-
-        var mailOptions = {
-          from: 'smart.parking.nokia@gmail.com',
-          to: `${req.body.email}`,
-          subject: 'Password - Smart Parking System @ Nokia',
-          text: `This is your password: ${rows[0].password}. If it wasn't you who requested this message, please contact us.` 
-        };
-        
-        transporter.sendMail(mailOptions, function(error, info){
-          if (error) {
-            console.log(error);
-          } else {
-            console.log('Email sent: ' + info.response);
-          }
-        });
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'aplication/json');
-        res.json({statusCode:200, message: "Email sent"});
+  const user = await User.find({email: req.body.email});
+  if(user.length > 0) {
+    const mailOptions = {
+      from: 'smart.parking.nokia@gmail.com',
+      to: `${req.body.email}`,
+      subject: 'Password - Smart Parking System @ Nokia',
+      text: `This is your password: ${rows[0].password}. If it wasn't you who requested this message, please contact us.` 
+    };
+    
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
       }
-      else{
-        var err = new Error(`No registered user with email: ${req.body.email}`);
-        err.statusCode = 404;
-        res.setHeader('Content-Type', 'application/json');
-        res.json({statusCode:err.statusCode, message: err.message});
-        return;
-      }
-      }catch(e){
-        console.log(e);
-    }
-});
-
+    });
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'aplication/json');
+    res.json({statusCode:200, message: "Email sent"});
+  }
+  else{
+    const err = new Error(`No registered user with email: ${req.body.email}`);
+    err.statusCode = 404;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({statusCode:err.statusCode, message: err.message});
+    return;
+  }
 });
 
 router.get('/logout', (req, res) => {

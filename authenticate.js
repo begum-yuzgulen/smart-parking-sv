@@ -1,11 +1,11 @@
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-var User = require('./models/user');
-var JwtStrategy = require('passport-jwt').Strategy;
-var ExtractJwt = require('passport-jwt').ExtractJwt;
-var jwt = require('jsonwebtoken');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const User = require('./models/user');
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+const jwt = require('jsonwebtoken');
 
-var config = require('./config');
+const config = require('./config');
 
 exports.local = passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());

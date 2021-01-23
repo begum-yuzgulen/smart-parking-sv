@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const spot = require('./routes/spot');
 var usersRouter = require('./routes/users');
+const subsRouter = require('./routes/subscription');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 var passport = require('passport');
@@ -35,6 +36,7 @@ app.use(bodyParser.json())
 app.use(passport.initialize());
 app.use('/users', usersRouter);
 app.use('/spot', spot);
+app.use('/subscription', subsRouter);
 app.use(cors());
   
 
