@@ -14,7 +14,7 @@ const Subscription = new Schema({
         default: ''
     },
     exp_date: {
-        type: String,
+        type: Date,
     },
     reservedSpot: {
         type: String,

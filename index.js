@@ -17,6 +17,10 @@ var config = require('./config');
 const mongoose = require('mongoose');
 const hostname = 'localhost';
 const port = 3000;
+const CronJob = require('cron').CronJob;
+const nodemailer = require('nodemailer');
+const Subscription = require('./models/subscription');
+const User = require('./models/user');
 
 const url = config.mongoUrl;
 const connect = mongoose.connect(url);
@@ -45,6 +49,41 @@ const server = http.createServer(app);
 server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}`);
 });
+
+const job = new CronJob('00 00 09 * * *', async () => {
+  const d = new Date();
+  d.setDate(d.getDate()-3);
+  const willExpire = await Subscription.find({exp_date: { $lt: d.getTime()}});
+  console.log("will expire soon: ", willExpire);
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    port: 587,
+    auth: {
+      user: 'smart.parking.nokia@gmail.com',
+      pass: 'smartparking123!'
+    }
+  });
+  
+  willExpire.forEach(async (sub) => {
+      const mailOptions = {
+        from: 'smart.parking.nokia@gmail.com',
+        to: sub.email,
+        subject: 'Your parking subscription will expire soon',
+        text: `Will expire` 
+      };
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+    });
+}, null, true);
+job.start();
+
+
 app.use(function(req, res, next) {
     next(createError(404));
   });

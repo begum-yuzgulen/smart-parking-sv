@@ -48,13 +48,18 @@ subsRouter.route('/').post(authenticate.verifyUser, async (req, res, next) => {
 
 subsRouter.route('/extend').post(authenticate.verifyUser, async (req, res, next) => {
   const result = await Subscription.updateMany(
-    {email: req.params.email}, 
-    {exp_date: req.params.expDate}
+    {email: req.body.email}, 
+    {exp_date: req.body.extend}
   );
   if (result.nModified > 0) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.json({success: true, status: 'Subscription extended succesfully!'});
+  }
+  else {
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: false, status: 'Failed to extend subscription'});
   }
 });
 
