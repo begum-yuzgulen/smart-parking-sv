@@ -6,7 +6,7 @@ const Feedback = require("../models/feedback");
 const feedbackRouter = express.Router();
 feedbackRouter.use(bodyParser.json());
 
-feedbackRouter.route('/').post(async (req, res, next) => {
+feedbackRouter.route('/').post(authenticate.verifyUser, async (req, res, next) => {
 
     const fb = new Feedback({email: req.body.email, message: req.body.message});
     await fb.save((err, user) => {
