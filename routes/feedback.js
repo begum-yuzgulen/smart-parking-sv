@@ -8,7 +8,7 @@ feedbackRouter.use(bodyParser.json());
 
 feedbackRouter.route('/').post(authenticate.verifyUser, async (req, res, next) => {
 
-    const fb = new Feedback({email: req.body.email, message: req.body.message});
+    const fb = new Feedback({email: req.user.username, message: req.body.message});
     await fb.save((err, user) => {
         if (err) {
           res.statusCode = 500;

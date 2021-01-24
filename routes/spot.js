@@ -35,20 +35,7 @@ spotRouter.route('/:sectionId').get(authenticate.verifyUser, async(req, res, nex
     res.send(sectionSpots);
 
 });
-spotRouter.route('/:sectionId/contact').post(authenticate.verifyUser, (req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
 
-    connection.query(`INSERT INTO Feedback VALUES (NULL,'${req.user.username}', '${req.body.message}')`, function (err, rows, fields) {
-        try {
-            res.json({ statusCode: 200, message: "Message sent" });
-        } catch (e) {
-            res.json({ statusCode: 400, message: "Message not sent" });
-            console.log(e);
-        }
-    });
-
-});
 spotRouter.route('/:sectionId/reserved').get(authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
