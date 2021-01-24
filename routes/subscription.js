@@ -6,10 +6,6 @@ const Subscription = require('../models/subscription');
 const subsRouter = express.Router();
 subsRouter.use(bodyParser.json());
 
-subsRouter.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
-
 subsRouter.route('/').get(authenticate.verifyUser, async (req, res, next) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
