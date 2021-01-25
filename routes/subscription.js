@@ -17,10 +17,22 @@ subsRouter.route('/profile').get(authenticate.verifyUser, async (req, res, next)
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
   const subscriptions = await Subscription.find({email: req.user.username});
+  if (subscriptions.length === 0) {
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: false, status: "You currently don't have a subscription."});
+    return;
+  }
   res.send(subscriptions[0]);
 });
 
 subsRouter.route('/').post(authenticate.verifyUser, async (req, res, next) => {
+  if (await Subscription.find({email: req.body.email}) > 0 ){
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: false, status: "A subscription for the provided email already exists."});
+    return;
+  }
   const sub = {
     email: req.body.email,
     cardId: req.body.cardId,
@@ -78,7 +90,7 @@ subsRouter.route('/edit').put(authenticate.verifyUser, async (req, res, next) =>
 
 subsRouter.route('/').delete(authenticate.verifyUser, async (req, res, next) => {
   const result = await Subscription.findOneAndDelete(
-    {email: req.data.email}, 
+    {email: req.body.email}, 
   );
   if (result !== undefined) {
     res.statusCode = 200;
