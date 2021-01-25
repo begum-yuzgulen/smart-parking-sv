@@ -6,7 +6,7 @@ var path = require('path');
 var mysql = require('mysql')
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const spot = require('./routes/spot');
+const spotRouter = require('./routes/spot');
 var usersRouter = require('./routes/users');
 const subsRouter = require('./routes/subscription');
 const feedbackRouter = require('./routes/feedback');
@@ -22,6 +22,7 @@ const CronJob = require('cron').CronJob;
 const nodemailer = require('nodemailer');
 const Subscription = require('./models/subscription');
 const User = require('./models/user');
+const Spot = require('./models/spot');
 
 const url = config.mongoUrl;
 const connect = mongoose.connect(url);
@@ -40,7 +41,7 @@ app.use(bodyParser.json())
 
 app.use(passport.initialize());
 app.use('/users', usersRouter);
-app.use('/spot', spot);
+app.use('/spotRouter', spotRouter);
 app.use('/subscription', subsRouter);
 app.use('/feedback', feedbackRouter);
 app.use(cors());
@@ -85,6 +86,29 @@ const job = new CronJob('00 00 09 * * *', async () => {
 }, null, true);
 job.start();
 
+const setReserved = new CronJob('* * * * *', async function() {
+  console.log("newDate", new Date());
+  console.log("toUpdate: ", toUpdate);
+  const result = await Spot.updateMany({
+    $and: [
+      {reservedFrom: { $gte: new Date()}},
+      {isReserved: false}
+    ]
+  }, {isReserved: true});
+  console.log("set ", result);
+}, null, true);
+setReserved.start();
+
+const unsetReserved = new CronJob('* * * * *', async function() {
+  const result = await Spot.updateMany({
+    $and: [
+      {reservedUntil: { $gte: new Date()}},
+      {isReserved: true}
+    ]
+  }, {isReserved: false});
+  console.log("unset", result);
+}, null, true);
+unsetReserved.start();
 
 app.use(function(req, res, next) {
     next(createError(404));

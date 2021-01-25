@@ -21,6 +21,16 @@ const Spot = new Schema({
         type: Boolean,
         default: false
     },
+    reservedFor: {
+        type: String,
+        default: ""
+    },
+    reservedFrom: {
+        type: Date
+    },
+    reservedUntil: {
+        type: Date
+    }
 }, {collection: "spot"});
 
 

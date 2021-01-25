@@ -36,57 +36,15 @@ spotRouter.route('/:sectionId').get(authenticate.verifyUser, async(req, res, nex
 
 });
 
-spotRouter.route('/:sectionId/reserved').get(authenticate.verifyUser, (req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    connection.query(`SELECT reserved FROM Card `, function (err, rows, fields) {
-        try {
-            res.send(JSON.stringify(rows));
-        } catch (e) {
-            console.log(e);
-        }
-    });
-
-});
-spotRouter.route('/:sectionId/profile').get(authenticate.verifyUser, (req, res, next) => {
-    let profile = {
-        email: req.user.username,
-        cardId: "",
-        mat_number: "",
-        exp_date: "",
-        reserved: ""
+spotRouter.route('/reserve').post(authenticate.verifyUser, async(req, res, next) => {
+    const spot = {
+        reservedFor: req.body.reservedFor,
+        reservedFrom: req.body.reservedFrom,
+        reservedUntil: req.body.reservedUntil,
     }
-    console.log('Username:', req.user.username);
-    console.log('Email:', req.user.email);
-    connection.query(`SELECT * FROM User WHERE email = '${req.user.username}'`, function (err, rows, fields) {
-        try {
-            if (rows.length > 0) {
-
-                profile.cardId = rows[0].cardId;
-                connection.query(`SELECT * FROM Card WHERE cardId = '${profile.cardId}'`, function (err, rows, fields) {
-                    try {
-                        profile.mat_number = rows[0].mat_number;
-                        profile.exp_date = rows[0].exp_date;
-                        profile.reserved = rows[0].reserved;
-                        console.log(profile);
-                        res.statusCode = 200;
-                        res.setHeader('Content-Type', 'application/json');
-                        res.send(profile);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                });
-
-            }
-            else {
-                console.log("No user found");
-            }
-        } catch (e) {
-            console.log(e);
-        }
+    await Spot.findOneAndUpdate({id: req.body.id}, spot, {upsert: true}, (err, doc) => {
+        if (err) return res.send(500, {error: err});
+        return res.send('Succesfully reserved');
     });
-
-
-
 });
 module.exports = spotRouter;
