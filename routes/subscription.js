@@ -78,7 +78,7 @@ subsRouter.route('/edit').put(authenticate.verifyUser, async (req, res, next) =>
 
 subsRouter.route('/').delete(authenticate.verifyUser, async (req, res, next) => {
   const result = await Subscription.findOneAndDelete(
-    {email: req.user.username}, 
+    {email: req.body.email}, 
   );
   if (result !== undefined) {
     res.statusCode = 200;
