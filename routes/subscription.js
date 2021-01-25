@@ -73,7 +73,7 @@ subsRouter.route('/extend').post(authenticate.verifyUser, async (req, res, next)
 
 subsRouter.route('/edit').put(authenticate.verifyUser, async (req, res, next) => {
   const result = await Subscription.findOneAndUpdate(
-    {email: req.user.username},
+    {email: req.body.email},
     req.body 
   );
   if (result !== undefined) {

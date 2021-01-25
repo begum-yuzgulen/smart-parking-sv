@@ -22,8 +22,7 @@ const Spot = new Schema({
         default: false
     },
     reservedFor: {
-        type: String,
-        default: ""
+        type: String
     },
     reservedFrom: {
         type: Date

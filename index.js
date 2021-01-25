@@ -87,32 +87,28 @@ const job = new CronJob('00 00 09 * * *', async () => {
 job.start();
 
 const setReserved = new CronJob('* * * * *', async function() {
-  const sub = await Spot.find({});
-  console.log("sub", sub[0].reservedFrom);
   const d = new Date();
-  d.setHours(d.getHours()+ 2);
+  d.setHours(d.getHours() + 2);
   console.log(d);
-  const result = await Spot.updateMany({
+  await Spot.updateMany({
     $and: [
       {reservedFrom: { $lte: d}},
       {reservedUntil: { $gte: d}},
       {isReserved: false}
     ]
   }, {isReserved: true});
-  console.log("set ", result);
 }, null, true);
 setReserved.start();
 
 const unsetReserved = new CronJob('* * * * *', async function() {
   const d = new Date();
   d.setHours(d.getHours()+ 2);
-  const result = await Spot.updateMany({
+  await Spot.updateMany({
     $and: [
       {reservedUntil: { $lte: d}},
       {isReserved: true}
     ]
   }, {isReserved: false});
-  console.log("unset", result);
 }, null, true);
 unsetReserved.start();
 

@@ -29,8 +29,7 @@ spotRouter.route('/:sectionId').get(authenticate.verifyUser, async(req, res, nex
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     const sectionSpots = await Spot.find({
-        section: req.params.sectionId, 
-        isFree: true
+        section: req.params.sectionId
     });
     res.send(sectionSpots);
 
@@ -38,7 +37,7 @@ spotRouter.route('/:sectionId').get(authenticate.verifyUser, async(req, res, nex
 
 spotRouter.route('/reserve').post(authenticate.verifyUser, async(req, res, next) => {
     const spot = {
-        reservedFor: req.body.reservedFor,
+        reservedFor: req.user.username,
         reservedFrom: req.body.reservedFrom,
         reservedUntil: req.body.reservedUntil,
     }
