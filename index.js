@@ -41,7 +41,7 @@ app.use(bodyParser.json())
 
 app.use(passport.initialize());
 app.use('/users', usersRouter);
-app.use('/spotRouter', spotRouter);
+app.use('/spot', spotRouter);
 app.use('/subscription', subsRouter);
 app.use('/feedback', feedbackRouter);
 app.use(cors());
@@ -87,11 +87,15 @@ const job = new CronJob('00 00 09 * * *', async () => {
 job.start();
 
 const setReserved = new CronJob('* * * * *', async function() {
-  console.log("newDate", new Date());
-  console.log("toUpdate: ", toUpdate);
+  const sub = await Spot.find({});
+  console.log("sub", sub[0].reservedFrom);
+  const d = new Date();
+  d.setHours(d.getHours()+ 2);
+  console.log(d);
   const result = await Spot.updateMany({
     $and: [
-      {reservedFrom: { $gte: new Date()}},
+      {reservedFrom: { $lte: d}},
+      {reservedUntil: { $gte: d}},
       {isReserved: false}
     ]
   }, {isReserved: true});
@@ -100,9 +104,11 @@ const setReserved = new CronJob('* * * * *', async function() {
 setReserved.start();
 
 const unsetReserved = new CronJob('* * * * *', async function() {
+  const d = new Date();
+  d.setHours(d.getHours()+ 2);
   const result = await Spot.updateMany({
     $and: [
-      {reservedUntil: { $gte: new Date()}},
+      {reservedUntil: { $lte: d}},
       {isReserved: true}
     ]
   }, {isReserved: false});

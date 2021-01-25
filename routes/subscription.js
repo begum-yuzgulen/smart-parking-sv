@@ -59,4 +59,37 @@ subsRouter.route('/extend').post(authenticate.verifyUser, async (req, res, next)
   }
 });
 
+subsRouter.route('/edit').put(async (req, res, next) => {
+  const result = await Subscription.findOneAndUpdate(
+    {email: req.user.username},
+    req.body 
+  );
+  if (result !== undefined) {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: true, status: 'Subscription cancelled succesfully!'});
+  }
+  else {
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: false, status: 'Failed to cancel subscription'});
+  }
+});
+
+subsRouter.route('/').delete(async (req, res, next) => {
+  const result = await Subscription.findOneAndDelete(
+    {email: req.user.username}, 
+  );
+  if (result !== undefined) {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: true, status: 'Subscription cancelled succesfully!'});
+  }
+  else {
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: false, status: 'Failed to cancel subscription'});
+  }
+});
+
 module.exports = subsRouter;
