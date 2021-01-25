@@ -59,7 +59,7 @@ subsRouter.route('/extend').post(authenticate.verifyUser, async (req, res, next)
   }
 });
 
-subsRouter.route('/edit').put(async (req, res, next) => {
+subsRouter.route('/edit').put(authenticate.verifyUser, async (req, res, next) => {
   const result = await Subscription.findOneAndUpdate(
     {email: req.user.username},
     req.body 
@@ -76,7 +76,7 @@ subsRouter.route('/edit').put(async (req, res, next) => {
   }
 });
 
-subsRouter.route('/').delete(async (req, res, next) => {
+subsRouter.route('/').delete(authenticate.verifyUser, async (req, res, next) => {
   const result = await Subscription.findOneAndDelete(
     {email: req.user.username}, 
   );

@@ -33,7 +33,8 @@ router.post('/signup', async (req, res, next) => {
     else {
       user.email = req.body.email,
       user.firstname = req.body.firstname,
-      user.lastname = req.body.lastname
+      user.lastname = req.body.lastname,
+      user.isAdmin = req.body.admin,
       await user.save((err, user) => {
         if(err){
           res.statusCode = 500;
