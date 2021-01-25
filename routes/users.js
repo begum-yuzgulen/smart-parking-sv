@@ -79,7 +79,7 @@ router.post('/forgotPassword', async (req, res) => {
       from: 'smart.parking.system1@gmail.com',
       to: `${req.body.email}`,
       subject: 'Password - Smart Parking System',
-      text: `This is your password: ${rows[0].password}. If it wasn't you who requested this message, please contact us.` 
+      text: `This is your password: ${user[0].password}. If it wasn't you who requested this message, please contact us.` 
     };
     
     transporter.sendMail(mailOptions, function(error, info){
