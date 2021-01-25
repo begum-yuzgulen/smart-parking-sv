@@ -68,7 +68,7 @@ router.post('/forgotPassword', async (req, res) => {
     service: 'gmail',
     port: 587,
     auth: {
-      user: 'smart.parking.nokia@gmail.com',
+      user: 'smart.parking.system1@gmail.com',
       pass: 'smartparking123!'
     }
   });
@@ -76,9 +76,9 @@ router.post('/forgotPassword', async (req, res) => {
   const user = await User.find({email: req.body.email});
   if(user.length > 0) {
     const mailOptions = {
-      from: 'smart.parking.nokia@gmail.com',
+      from: 'smart.parking.system1@gmail.com',
       to: `${req.body.email}`,
-      subject: 'Password - Smart Parking System @ Nokia',
+      subject: 'Password - Smart Parking System',
       text: `This is your password: ${rows[0].password}. If it wasn't you who requested this message, please contact us.` 
     };
     

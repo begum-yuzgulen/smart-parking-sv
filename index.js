@@ -63,17 +63,17 @@ const job = new CronJob('00 00 09 * * *', async () => {
     service: 'gmail',
     port: 587,
     auth: {
-      user: 'smart.parking.nokia@gmail.com',
+      user: 'smart.parking.system1@gmail.com',
       pass: 'smartparking123!'
     }
   });
   
   willExpire.forEach(async (sub) => {
       const mailOptions = {
-        from: 'smart.parking.nokia@gmail.com',
+        from: 'smart.parking.system1@gmail.com',
         to: sub.email,
         subject: 'Your parking subscription will expire soon',
-        text: `Will expire` 
+        text: `Hello, your parking subscription will expire soon. Please contact us or access our website, if you want to extend it`,
       };
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
