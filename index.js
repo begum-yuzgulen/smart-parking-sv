@@ -88,8 +88,6 @@ job.start();
 
 const setReserved = new CronJob('* * * * *', async function() {
   const d = new Date();
-  d.setHours(d.getHours() + 2);
-  console.log(d);
   await Spot.updateMany({
     $and: [
       {reservedFrom: { $lte: d}},
@@ -102,7 +100,6 @@ setReserved.start();
 
 const unsetReserved = new CronJob('* * * * *', async function() {
   const d = new Date();
-  d.setHours(d.getHours()+ 2);
   await Spot.updateMany({
     $and: [
       {reservedUntil: { $lte: d}},
