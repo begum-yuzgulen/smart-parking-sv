@@ -13,28 +13,15 @@ subsRouter.route('/').get(authenticate.verifyUser, async (req, res, next) => {
   res.send(subscriptions)
 });
 
-subsRouter.route('/profile').get(authenticate.verifyUser, async (req, res, next) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'application/json');
-  const subscriptions = await Subscription.find({email: req.user.username});
-  if (subscriptions.length === 0) {
-    res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
-    res.json({success: false, status: "You currently don't have a subscription."});
-    return;
-  }
-  res.send(subscriptions[0]);
-});
-
-subsRouter.route('/').post(authenticate.verifyUser, async (req, res, next) => {
-  if (await Subscription.find({email: req.body.email}) > 0 ){
+subsRouter.route('/add').post(authenticate.verifyUser, async (req, res, next) => {
+  if (await Subscription.find({email: req.user.username}) > 0 ){
     res.statusCode = 500;
     res.setHeader('Content-Type', 'application/json');
     res.json({success: false, status: "A subscription for the provided email already exists."});
     return;
   }
   const sub = {
-    email: req.body.email,
+    email: req.user.username,
     cardId: req.body.cardId,
     mat_number: req.body.matNumber,
     exp_date: req.body.expDate,
@@ -52,6 +39,19 @@ subsRouter.route('/').post(authenticate.verifyUser, async (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
     res.json({success: true, status: 'Subscription added succesfully!'});
   })
+});
+
+subsRouter.route('/profile').get(authenticate.verifyUser, async (req, res, next) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'application/json');
+  const subscriptions = await Subscription.find({email: req.user.username});
+  if (subscriptions.length === 0) {
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: false, status: "You currently don't have a subscription."});
+    return;
+  }
+  res.send(subscriptions[0]);
 });
 
 subsRouter.route('/extend').post(authenticate.verifyUser, async (req, res, next) => {

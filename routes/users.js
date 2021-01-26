@@ -11,7 +11,6 @@ var MongoClient = require('mongodb').MongoClient;
 var router = express.Router();
 router.use(bodyParser.json());
 
-/* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
