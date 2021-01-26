@@ -23,8 +23,8 @@ subsRouter.route('/add').post(authenticate.verifyUser, async (req, res, next) =>
   const sub = {
     email: req.user.username,
     cardId: req.body.cardId,
-    mat_number: req.body.matNumber,
-    exp_date: req.body.expDate,
+    mat_number: req.body.mat_number,
+    exp_date: req.body.exp_date,
     reservedSpot: req.body.reservedSpot
   }
   const subscription = new Subscription(sub);
